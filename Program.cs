@@ -10,12 +10,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.Configure<ClickHouseOptions>(builder.Configuration.GetSection(ClickHouseOptions.SectionName));
 builder.Services.AddHttpClient(ClickHouseConnectionSource.HttpClientName);
 builder.Services.AddSingleton<ClickHouseConnectionSource>();
+builder.Services.AddSingleton<ReadingRepository>();
 builder.Services.AddSingleton<ReadingQueue>();
 builder.Services.AddHostedService<ClickHouseWriter>();
 
 builder.Services.Configure<MqttOptions>(builder.Configuration.GetSection(MqttOptions.SectionName));
 builder.Services.AddSingleton<MqttIngestService>();
 builder.Services.AddHostedService(services => services.GetRequiredService<MqttIngestService>());
+
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
@@ -27,12 +30,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapOpenApi();
+
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
