@@ -13,6 +13,10 @@ builder.Services.AddSingleton<ClickHouseConnectionSource>();
 builder.Services.AddSingleton<ReadingQueue>();
 builder.Services.AddHostedService<ClickHouseWriter>();
 
+builder.Services.Configure<MqttOptions>(builder.Configuration.GetSection(MqttOptions.SectionName));
+builder.Services.AddSingleton<MqttIngestService>();
+builder.Services.AddHostedService(services => services.GetRequiredService<MqttIngestService>());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
