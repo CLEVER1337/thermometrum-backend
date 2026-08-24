@@ -9,11 +9,16 @@ namespace thermometrum_backend.Storage;
 public sealed class ReadingRepository
 {
     private readonly ClickHouseConnectionSource _connectionSource;
+    private readonly ILogger<ReadingRepository> _logger;
     private readonly string _table;
 
-    public ReadingRepository(ClickHouseConnectionSource connectionSource, IOptions<ClickHouseOptions> options)
+    public ReadingRepository(
+        ClickHouseConnectionSource connectionSource,
+        IOptions<ClickHouseOptions> options,
+        ILogger<ReadingRepository> logger)
     {
         _connectionSource = connectionSource;
+        _logger = logger;
         _table = options.Value.TableName;
     }
 
@@ -116,8 +121,9 @@ public sealed class ReadingRepository
             await command.ExecuteScalarAsync(cancellationToken);
             return true;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
+            _logger.LogWarning(exception, "ClickHouse is not reachable");
             return false;
         }
     }
