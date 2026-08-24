@@ -3,11 +3,12 @@ services:
     image: clickhouse/clickhouse-server:latest
     container_name: thermometrum-clickhouse
     ports:
-      - "8123:8123"
-      - "9000:9000"
+      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:9000:9000"
     volumes:
       - clickhouse-data:/var/lib/clickhouse
       - ./clickhouse/init:/docker-entrypoint-initdb.d:ro
+      - ./clickhouse/users.d/thermometrum.xml:/etc/clickhouse-server/users.d/thermometrum.xml:ro
     ulimits:
       nofile:
         soft: 262144
