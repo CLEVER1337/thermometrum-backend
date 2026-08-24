@@ -1,3 +1,4 @@
+using System.Net;
 using thermometrum_backend.Configuration;
 using thermometrum_backend.Ingest;
 using thermometrum_backend.Storage;
@@ -8,7 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.Configure<ClickHouseOptions>(builder.Configuration.GetSection(ClickHouseOptions.SectionName));
-builder.Services.AddHttpClient(ClickHouseConnectionSource.HttpClientName);
+builder.Services.AddHttpClient(ClickHouseConnectionSource.HttpClientName)
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        AutomaticDecompression = DecompressionMethods.All,
+    });
 builder.Services.AddSingleton<ClickHouseConnectionSource>();
 builder.Services.AddSingleton<ReadingRepository>();
 builder.Services.AddSingleton<ReadingQueue>();
