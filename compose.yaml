@@ -1,4 +1,19 @@
 services:
+  backend:
+    build: .
+    container_name: thermometrum-backend
+    ports:
+      - "5056:8080"
+    environment:
+      ClickHouse__ConnectionString: "Host=clickhouse;Port=8123;Database=thermometrum;Username=thermometrum"
+      Mqtt__Host: "mosquitto"
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    restart: unless-stopped
+
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     container_name: thermometrum-clickhouse

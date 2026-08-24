@@ -1,0 +1,11 @@
+bin/
+obj/
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+compose.yaml
+README.md
+clickhouse/
+mosquitto/
+scripts/
