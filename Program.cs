@@ -1,7 +1,17 @@
+using thermometrum_backend.Configuration;
+using thermometrum_backend.Ingest;
+using thermometrum_backend.Storage;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.Configure<ClickHouseOptions>(builder.Configuration.GetSection(ClickHouseOptions.SectionName));
+builder.Services.AddHttpClient(ClickHouseConnectionSource.HttpClientName);
+builder.Services.AddSingleton<ClickHouseConnectionSource>();
+builder.Services.AddSingleton<ReadingQueue>();
+builder.Services.AddHostedService<ClickHouseWriter>();
 
 var app = builder.Build();
 
