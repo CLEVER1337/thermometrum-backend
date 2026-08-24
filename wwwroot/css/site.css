@@ -29,3 +29,43 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.reading-value {
+  font-size: 2.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 0;
+}
+
+#chart {
+  width: 100%;
+  height: 240px;
+  display: block;
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-line-temperature {
+  stroke: #d9480f;
+}
+
+.chart-line-humidity {
+  stroke: #1b6ec2;
+}
+
+.chart-legend span {
+  font-size: 0.875rem;
+  margin-left: 1rem;
+}
+
+.chart-legend .legend-temperature {
+  color: #d9480f;
+}
+
+.chart-legend .legend-humidity {
+  color: #1b6ec2;
+}

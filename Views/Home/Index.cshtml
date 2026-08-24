@@ -1,8 +1,82 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!Model.StorageAvailable)
+{
+    <div class="alert alert-danger" role="alert">
+        ClickHouse is unreachable. Start it with <code>docker compose up -d</code> and reload the page.
+    </div>
+}
+else if (Model.Selected is null)
+{
+    <div class="alert alert-info" role="alert">
+        No sensor has sent a reading yet. Publish one to <code>thermometrum/&lt;device&gt;/reading</code>.
+    </div>
+}
+else
+{
+    <div id="dashboard"
+         data-device-id="@Model.Selected.DeviceId"
+         data-hours="@Model.Hours"
+         data-bucket-minutes="@Model.BucketMinutes">
+
+        @if (Model.Devices.Count > 1)
+        {
+            <form method="get" class="mb-3">
+                <label class="form-label" for="deviceId">Device</label>
+                <select class="form-select w-auto" id="deviceId" name="deviceId" onchange="this.form.submit()">
+                    @foreach (var device in Model.Devices)
+                    {
+                        <option value="@device.DeviceId" selected="@(device.DeviceId == Model.Selected.DeviceId)">@device.DeviceId</option>
+                    }
+                </select>
+            </form>
+        }
+
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+                <div class="card reading-card h-100">
+                    <div class="card-body">
+                        <h2 class="card-title h6 text-muted">Temperature</h2>
+                        <p class="reading-value" id="temperature-value">@Model.Selected.Temperature.ToString("0.0") °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card reading-card h-100">
+                    <div class="card-body">
+                        <h2 class="card-title h6 text-muted">Humidity</h2>
+                        <p class="reading-value" id="humidity-value">@Model.Selected.Humidity.ToString("0.0") %</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-muted" id="updated-at" data-last-seen="@Model.Selected.LastSeen.ToString("O")"></p>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-baseline mb-2">
+                    <h2 class="h6 text-muted mb-0">Last @Model.Hours hours</h2>
+                    <div class="chart-legend">
+                        <span class="legend-temperature">Temperature</span>
+                        <span class="legend-humidity">Humidity</span>
+                    </div>
+                </div>
+                <svg id="chart" viewBox="0 0 800 240" preserveAspectRatio="none" role="img" aria-label="Temperature and humidity over the last @Model.Hours hours">
+                    <path id="chart-temperature" class="chart-line chart-line-temperature" d="" />
+                    <path id="chart-humidity" class="chart-line chart-line-humidity" d="" />
+                </svg>
+                <p class="text-muted small mb-0" id="chart-caption"></p>
+            </div>
+        </div>
+
+        <p class="text-danger mt-3 d-none" id="refresh-error">The backend stopped responding — showing the last values received.</p>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}
